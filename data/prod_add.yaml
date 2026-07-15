@@ -1,0 +1,7 @@
+prod_add001:
+  name: "新疆冰糖心"
+  category_id: "1"
+  price: "39.9"
+  stock: "50"
+  origin: "新疆阿克苏"
+  description: "超甜"
