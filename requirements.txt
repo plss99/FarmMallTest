@@ -1,0 +1,7 @@
+requests==2.34.2
+PyMySQL==1.2.0
+pytest==9.1.1
+loguru==0.7.3
+PyYAML==6.0.3
+allure-pytest==2.16.0
+allure-python-commons==2.16.0

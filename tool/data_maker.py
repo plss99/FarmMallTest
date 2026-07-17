@@ -8,13 +8,8 @@ import pytest
 
 # 连接数据库函数，返回数据库连接对象
 def get_db_conn():
-    return pymysql.connect(
-        host="127.0.0.1",
-        port=3307,
-        user="root",
-        password="REDACTED",
-        database="farm_mall"
-    )
+    from config import DB_CONFIG
+    return pymysql.connect(**DB_CONFIG)
 
 # 数据库断言工具
 def db_assert(product_id, **expected):
