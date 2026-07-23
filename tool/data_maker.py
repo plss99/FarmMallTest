@@ -57,6 +57,18 @@ def clean_order_data(order_id):
     cursor.close()
     conn.close()
 
+
+def clean_user_by_username(username):
+    """清理指定用户名的注册数据，用于注册测试的可重复执行"""
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE username = %s", (username,))
+        conn.commit()
+    finally:
+        cursor.close()
+        conn.close()
+
 # 数据型夹具（造测试数据 + 自动清理）
 @pytest.fixture
 def active_product():

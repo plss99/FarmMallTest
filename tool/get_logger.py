@@ -1,4 +1,5 @@
 # 日志封装 + 自动生成带趋势的 Allure 报告
+import os
 import sys
 import subprocess
 import shutil
@@ -80,6 +81,24 @@ class GetLogger:
         shutil.copytree(HISTORY_DIR, target)
 
     @staticmethod
+    def copy_history_for_trend():
+        """
+        在 pytest 启动时将上一次报告的 history 复制到 allure_results，
+        这样 Allure 生成报告时才能合并历史数据，产生趋势图。
+        必须在 pytest 写入测试结果之前调用。
+        """
+        GetLogger._setup()
+        if not HISTORY_DIR.exists():
+            logger.debug("未找到历史报告 history 目录，首次运行无趋势图属于正常现象")
+            return
+        RESULT_DIR.mkdir(parents=True, exist_ok=True)
+        target = RESULT_DIR / "history"
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(HISTORY_DIR, target)
+        logger.info("已复制历史趋势数据到 {}", target)
+
+    @staticmethod
     def run_tests(test_target=None, markers=None, clean=True):
         """
         运行 pytest 并产出 allure 原始数据
@@ -105,23 +124,51 @@ class GetLogger:
 
     @staticmethod
     def generate_report():
-        """生成带趋势的 Allure HTML 报告"""
+        """生成带趋势的 Allure HTML 报告（趋势数据已在 pytest_configure 中复制）"""
         GetLogger._setup()
-        GetLogger._copy_history()
 
         if not RESULT_DIR.exists() or not any(RESULT_DIR.iterdir()):
             logger.warning("allure_results 目录为空，请先运行测试")
             return 1
 
-        cmd = ["allure", "generate", str(RESULT_DIR), "-o", str(HTML_DIR), "--clean"]
-        logger.info("生成报告: {}", " ".join(cmd))
-        result = subprocess.run(cmd, cwd=str(BASE_DIR))
+        cmd = f"allure generate {RESULT_DIR} -o {HTML_DIR} --clean"
+        logger.info("生成报告: {}", cmd)
+        result = subprocess.run(cmd, cwd=str(BASE_DIR), shell=True)
 
         if result.returncode == 0:
             logger.info("报告已生成: {}", HTML_DIR / "index.html")
         else:
             logger.error("报告生成失败，请确认已安装 allure 命令行工具")
         return result.returncode
+
+    @staticmethod
+    def serve_report(port=8923):
+        """启动 HTTP 服务查看 Allure 报告，按 Ctrl+C 停止"""
+        GetLogger._setup()
+        index = HTML_DIR / "index.html"
+        if not index.exists():
+            logger.error("报告文件不存在，请先运行 pytest 生成报告")
+            return
+
+        import http.server
+        import socketserver
+
+        os.chdir(str(HTML_DIR))
+
+        handler = http.server.SimpleHTTPRequestHandler
+        try:
+            with socketserver.TCPServer(("", port), handler) as httpd:
+                url = f"http://127.0.0.1:{port}"
+                logger.info("Allure 报告已启动: {}", url)
+                print(f"\n{'='*60}")
+                print(f"  Allure 报告: {url}")
+                print(f"  按 Ctrl+C 停止服务")
+                print(f"{'='*60}\n")
+                httpd.serve_forever()
+        except KeyboardInterrupt:
+            logger.info("报告服务已停止")
+        except OSError as e:
+            logger.error("端口 {} 已被占用: {}", port, e)
 
     @staticmethod
     def run_and_report(test_target=None, markers=None, clean=True):
@@ -143,10 +190,16 @@ if __name__ == "__main__":
                         help="不清空上次的 allure_results")
     parser.add_argument("--report-only", action="store_true",
                         help="仅生成报告，不运行测试")
+    parser.add_argument("-s", "--serve", action="store_true",
+                        help="启动 HTTP 服务查看报告")
+    parser.add_argument("-p", "--port", type=int, default=8923,
+                        help="报告服务端口（默认 8923）")
 
     args = parser.parse_args()
 
-    if args.report_only:
+    if args.serve:
+        GetLogger.serve_report(args.port)
+    elif args.report_only:
         GetLogger.generate_report()
     else:
         GetLogger.run_and_report(args.target, args.markers, clean=not args.no_clean)

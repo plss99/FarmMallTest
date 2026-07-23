@@ -1,109 +1,100 @@
 # 全链路接口-以用户购买苹果为例
 import re
-
 import requests
+from loguru import logger
 
 import api
 
 
 class ApiAllChain:
-    # 初始化
     def __init__(self):
-        # 用户session：注册、搜索、购买、结算、查看订单
         self.user_session = requests.Session()
-        # 管理员session：登录后台、修改订单状态
         self.admin_session = requests.Session()
-        # 搜索商品url
         self.url_search = api.host + "/"
-        # 结算订单url
         self.url_order = api.host + "/checkout"
-        # 管理员登录url
         self.url_admin_login = api.host + "/admin"
         self.product_id = None
         self.order_id = None
 
-    # 1.用户登录
     def api_01_login(self, username=None, password=None):
-        if username is None:
-            username = api.default_username
-        if password is None:
-            password = api.default_password
+        username = username or api.default_username
+        password = password or api.default_password
         login_url = api.host + "/login"
-        data = {
-            "username": username,
-            "password": password,
-        }
-        return self.user_session.post(login_url, data=data)
+        data = {"username": username, "password": password}
+        logger.info("全链路-用户登录 | POST {} | data={}", login_url, data)
+        resp = self.user_session.post(login_url, data=data)
+        logger.info("全链路-用户登录 | 响应状态码: {}", resp.status_code)
+        return resp
 
-    # 2.搜索商品，从响应体中提取商品ID
     def api_02_search(self, keyword=None):
-        if keyword is None:
-            keyword = api.default_keyword
+        keyword = keyword or api.default_keyword
         params = {"keyword": keyword}
+        logger.info("全链路-搜索商品 | GET {} | keyword={}", self.url_search, keyword)
         resp = self.user_session.get(self.url_search, params=params)
+        logger.info("全链路-搜索商品 | 响应状态码: {}", resp.status_code)
         match = re.search(r'/product/(\d+)', resp.text)
         if not match:
             raise Exception(f"搜索 '{keyword}' 未找到商品")
         self.product_id = int(match.group(1))
+        logger.info("全链路-搜索商品 | 提取到 product_id={}", self.product_id)
         return self.product_id
 
-    # 3.加入购物车
     def api_03_buy(self):
         url = api.host + f"/product/{self.product_id}/buy"
-        return self.user_session.post(url)
+        logger.info("全链路-加入购物车 | POST {} | product_id={}", url, self.product_id)
+        resp = self.user_session.post(url)
+        logger.info("全链路-加入购物车 | 响应状态码: {}", resp.status_code)
+        return resp
 
-    # 4.结算订单，从响应中提取订单ID
     def api_04_order(self, receiver_name=None, phone=None, address=None, remark=""):
-        if receiver_name is None:
-            receiver_name = api.default_receiver_name
-        if phone is None:
-            phone = api.default_phone
-        if address is None:
-            address = api.default_address
+        receiver_name = receiver_name or api.default_receiver_name
+        phone = phone or api.default_phone
+        address = address or api.default_address
         data = {
             "receiver_name": receiver_name,
             "phone": phone,
             "address": address,
             "remark": remark,
         }
+        logger.info("全链路-提交订单 | POST {} | data={}", self.url_order, data)
         resp = self.user_session.post(self.url_order, data=data, allow_redirects=False)
+        logger.info("全链路-提交订单 | 响应状态码: {}", resp.status_code)
         match = re.search(r'/orders/(\d+)', resp.headers.get("Location", ""))
         if match:
             self.order_id = int(match.group(1))
+            logger.info("全链路-提交订单 | 提取到 order_id={}", self.order_id)
         return resp
 
-    # 5.管理员登录
     def api_05_admin_login(self, username=None, password=None):
-        if username is None:
-            username = api.default_admin_username
-        if password is None:
-            password = api.default_admin_password
+        username = username or api.default_admin_username
+        password = password or api.default_admin_password
         login_url = api.host + "/login"
-        data = {
-            "username": username,
-            "password": password,
-        }
+        data = {"username": username, "password": password}
+        logger.info("全链路-管理员登录 | POST {} | data={}", login_url, data)
         self.admin_session.post(login_url, data=data)
-        return self.admin_session.get(self.url_admin_login)
+        logger.info("全链路-管理员访问后台 | GET {}", self.url_admin_login)
+        resp = self.admin_session.get(self.url_admin_login)
+        logger.info("全链路-管理员访问后台 | 响应状态码: {}", resp.status_code)
+        return resp
 
-    # 6.管理员修改订单状态
     def api_06_admin_update(self, order_id=None, status=None):
-        if order_id is None:
-            order_id = self.order_id
-        if status is None:
-            status = api.default_order_status
+        order_id = order_id or self.order_id
+        status = status or api.default_order_status
         url = api.host + f"/admin/orders/{order_id}/status"
         data = {"status": status}
-        return self.admin_session.post(url, data=data)
+        logger.info("全链路-修改订单状态 | POST {} | data={}", url, data)
+        resp = self.admin_session.post(url, data=data)
+        logger.info("全链路-修改订单状态 | 响应状态码: {}", resp.status_code)
+        return resp
 
-    # 7.用户查看订单状态
     def api_07_user_view(self, order_id=None):
-        if order_id is None:
-            order_id = self.order_id
+        order_id = order_id or self.order_id
         url = api.host + f"/orders/{order_id}"
-        return self.user_session.get(url=url)
+        logger.info("全链路-查看订单状态 | GET {}", url)
+        resp = self.user_session.get(url=url)
+        logger.info("全链路-查看订单状态 | 响应状态码: {}", resp.status_code)
+        return resp
 
-    # 组合业务方法
     def api_all_chain(self):
         self.api_01_login()
         self.api_02_search()
