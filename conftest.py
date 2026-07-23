@@ -4,8 +4,9 @@ from tool.get_logger import GetLogger
 
 
 def pytest_configure(config):
-    """session 启动：配置 loguru 日志 + 复制历史趋势数据到 allure_results"""
+    """session 启动：清理旧测试结果（保留历史趋势），配置日志，复制历史趋势"""
     GetLogger.get_logger()
+    GetLogger.clean_results()
     GetLogger.copy_history_for_trend()
 
 

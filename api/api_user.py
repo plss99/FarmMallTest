@@ -16,25 +16,25 @@ class ApiUser:
         data = {"username": username, "password": password}
         logger.info("用户登录 | POST {} | data={}", self.url_login, data)
         resp = self.session.post(url=self.url_login, data=data)
-        logger.info("用户登录 | 响应状态码: {} | 响应内容: {}", resp.status_code, resp.text[:200])
+        logger.info(f"用户登录 | 响应状态码: {resp.status_code} | 响应内容: {resp.text}")
         return resp
 
     def api_user_reg(self, r_username, r_password):
         data = {"username": r_username, "password": r_password, "confirm": r_password}
         logger.info("用户注册 | POST {} | data={}", self.url_reg, data)
         resp = self.session.post(url=self.url_reg, data=data)
-        logger.info("用户注册 | 响应状态码: {} | 响应内容: {}", resp.status_code, resp.text[:200])
+        logger.info(f"用户注册 | 响应状态码: {resp.status_code} | 响应内容: {resp.text}")
         return resp
 
     def api_user_logout(self):
         logger.info("用户退出 | GET {}", self.url_logout)
         resp = self.session.get(url=self.url_logout)
-        logger.info("用户退出 | 响应状态码: {}", resp.status_code)
+        logger.info(f"用户退出 | 响应状态码: {resp.status_code}")
         return resp
 
     def api_user_login_success(self):
         data = {"username": "小农户", "password": "REDACTED"}
         logger.info("普通用户快速登录 | POST {} | data={}", self.url_login, data)
         resp = self.session.post(url=self.url_login, data=data)
-        logger.info("普通用户快速登录 | 响应状态码: {}", resp.status_code)
+        logger.info(f"普通用户快速登录 | 响应状态码: {resp.status_code}")
         return resp

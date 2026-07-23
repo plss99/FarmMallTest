@@ -95,3 +95,33 @@ class GetDBInfo:
         if not result:
             raise Exception(f"订单 ID {order_id} 不存在")
         return result[0]
+
+    @staticmethod
+    def get_order_id(username):
+        """
+        根据用户名获取该用户最新的一笔订单ID（按创建时间倒序）
+        :param username: 用户名字符串
+        :return: 订单ID（int），如果没有订单则返回 None
+        """
+        conn = get_db_conn()
+        cursor = conn.cursor()
+        try:
+            # 1. 先查用户ID
+            cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            if not user:
+                raise ValueError(f"用户 '{username}' 不存在")
+            user_id = user[0]
+
+            # 2. 查询该用户最新订单
+            cursor.execute(
+                "SELECT id FROM orders WHERE user_id = %s ORDER BY created_at DESC LIMIT 1",
+                (user_id,)
+            )
+            result = cursor.fetchone()
+            if not result:
+                return None
+            return result[0]
+        finally:
+            cursor.close()
+            conn.close()

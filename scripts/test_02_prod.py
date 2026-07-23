@@ -21,13 +21,15 @@ class TestProd:
     def test_02_prod_search(self, active_product):
         product_name = active_product["name"]
         prod = ApiProd(product_id=active_product["id"])
-        resp = prod.api_prod_search(keyword=product_name)
         try:
+            resp = prod.api_prod_search(keyword=product_name)
             assert resp.status_code == 200
             assert product_name in resp.text
         except Exception as e:
             logger.error(f"错误日志:{e}")
             raise e
+        finally:
+            prod = None
 
     def test_03_prod_detail(self, active_product):
         product_name = active_product["name"]

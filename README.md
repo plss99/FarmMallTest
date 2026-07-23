@@ -69,9 +69,11 @@ pytest -m "scenario"    # 场景链路测试
 pytest 运行结束后会自动生成 HTML 报告，启动服务即可查看：
 
 ```bash
-python tool/get_logger.py -s          # 默认端口 8923
+python tool/get_logger.py -s
+```
 
-python tool/get_logger.py -s -p 8080  # 自定义端口
+```bash
+python tool/get_logger.py -s -p 8080
 ```
 ---
 浏览器打开 `http://127.0.0.1:8923`，按 `Ctrl+C` 停止。

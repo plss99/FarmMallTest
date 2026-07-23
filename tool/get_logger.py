@@ -72,6 +72,16 @@ class GetLogger:
             RESULT_DIR.mkdir()
 
     @staticmethod
+    def clean_results():
+        """清理 allure_results 目录（测试前调用，避免新旧结果混在一起）"""
+        GetLogger._setup()
+        if RESULT_DIR.exists():
+            shutil.rmtree(RESULT_DIR)
+        RESULT_DIR.mkdir(parents=True, exist_ok=True)
+        logger.info("已清理 allure_results 目录")
+        return RESULT_DIR
+
+    @staticmethod
     def _copy_history():
         if not HISTORY_DIR.exists():
             return
@@ -109,7 +119,7 @@ class GetLogger:
         GetLogger._setup()
         GetLogger._ensure_dirs()
         if clean:
-            GetLogger._clean_results()
+            GetLogger.clean_results()
 
         cmd = [sys.executable, "-m", "pytest"]
         if test_target:
@@ -131,7 +141,7 @@ class GetLogger:
             logger.warning("allure_results 目录为空，请先运行测试")
             return 1
 
-        cmd = f"allure generate {RESULT_DIR} -o {HTML_DIR} --clean"
+        cmd = f'allure generate "{RESULT_DIR}" -o "{HTML_DIR}" --clean'
         logger.info("生成报告: {}", cmd)
         result = subprocess.run(cmd, cwd=str(BASE_DIR), shell=True)
 
