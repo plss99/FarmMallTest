@@ -36,9 +36,7 @@ class TestUser:
 
     @pytest.mark.parametrize("r_username,r_password", read_yaml("user_reg.yaml"))
     def test_03_user_reg(self, r_username, r_password):
-        r_username = r_username.replace(
-            "{{timestamp}}", datetime.now().strftime("%Y%m%d%H%M%S%f")
-        )
+        r_username = r_username
         resp = self.user.api_user_reg(r_username, r_password)
         try:
             assert resp.status_code == 302
