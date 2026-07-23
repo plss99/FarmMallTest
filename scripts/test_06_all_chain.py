@@ -1,5 +1,5 @@
 # 全链路流程测试-用户登录-购买商品-支付订单->管理员登录-修改订单状态->用户查看订单状态
-import pytest
+
 from loguru import logger
 from api.api_all_chain import ApiAllChain
 from tool.get_db_info import GetDBInfo
