@@ -39,7 +39,7 @@ class TestUser:
         r_username = r_username
         resp = self.user.api_user_reg(r_username, r_password)
         try:
-            assert resp.status_code == 302
+            assert resp.status_code == 200
         except Exception as e:
             logger.error(f"错误日志:{e}")
             raise e
