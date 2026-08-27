@@ -1,3 +1,7 @@
 /.venv/
 /.deepeval/
 /config.py
+__pycache__/
+log/
+report/
+*.zip
