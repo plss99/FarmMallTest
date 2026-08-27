@@ -3,6 +3,7 @@ import requests
 from loguru import logger
 
 import api
+from config import TEST_ACCOUNTS
 
 
 class ApiUser:
@@ -14,14 +15,14 @@ class ApiUser:
 
     def api_user_login(self, username, password):
         data = {"username": username, "password": password}
-        logger.info("用户登录 | POST {} | data={}", self.url_login, data)
+        logger.info("用户登录 | POST {} | username={}", self.url_login, username)
         resp = self.session.post(url=self.url_login, data=data)
         logger.info(f"用户登录 | 响应状态码: {resp.status_code} | 响应内容: {resp.text}")
         return resp
 
     def api_user_reg(self, r_username, r_password):
         data = {"username": r_username, "password": r_password, "confirm": r_password}
-        logger.info("用户注册 | POST {} | data={}", self.url_reg, data)
+        logger.info("用户注册 | POST {} | username={}", self.url_reg, r_username)
         resp = self.session.post(url=self.url_reg, data=data)
         logger.info(f"用户注册 | 响应状态码: {resp.status_code} | 响应内容: {resp.text}")
         return resp
@@ -33,8 +34,8 @@ class ApiUser:
         return resp
 
     def api_user_login_success(self):
-        data = {"username": "小农户", "password": "REDACTED"}
-        logger.info("普通用户快速登录 | POST {} | data={}", self.url_login, data)
+        data = dict(TEST_ACCOUNTS["user"])
+        logger.info("普通用户快速登录 | POST {} | username={}", self.url_login, data["username"])
         resp = self.session.post(url=self.url_login, data=data)
         logger.info(f"普通用户快速登录 | 响应状态码: {resp.status_code}")
         return resp

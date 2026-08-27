@@ -22,7 +22,7 @@ FarmMallTest/
 ├── tool/                 # 工具层（夹具、日志、报告、数据清理）
 ├── log/                  # 日志输出
 ├── report/               # Allure 报告
-├── config.py             # 数据库配置
+├── config.example.py      # 数据库/账号配置模板（复制为 config.py）
 ├── conftest.py           # Pytest 全局配置（日志 + 自动生成报告）
 ├── pytest.ini            # Pytest 运行配置
 └── requirements.txt      # 依赖列表
@@ -39,10 +39,16 @@ FarmMallTest/
 # 2. 安装依赖
 pip install -r requirements.txt
 
-# 3. 配置数据库（在样例模板中填入真实信息之后另存为 config.py）
+# 3. 配置数据库与测试账号（在样例模板中填入真实信息之后另存为 config.py）
 copy config.example.py config.py
 
-# 4. 确保 farm-mall 后端已启动后，运行测试
+# 4. 复制本地测试数据模板（真实账号密码只保存在本地，不提交到 Git）
+copy data\user_login.example.yaml data\user_login.yaml
+copy data\user_login_error.example.yaml data\user_login_error.yaml
+copy data\admin_login.example.yaml data\admin_login.yaml
+copy data\user_reg.example.yaml data\user_reg.yaml
+
+# 5. 确保 farm-mall 后端已启动后，运行测试
 pytest
 ```
 

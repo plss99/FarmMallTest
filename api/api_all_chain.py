@@ -23,13 +23,13 @@ class ApiAllChain:
             "password": api.default_password,
             "confirm": api.default_password
         }
-        logger.info(f"全链路-用户注册 | POST {self.url_reg} | data={data}")
+        logger.info(f"全链路-用户注册 | POST {self.url_reg} | username={data['username']}")
         resp = self.session.post(self.url_reg, data=data)
         return resp
 
     def api_01_login(self):
         data = {"username": api.default_username, "password": api.default_password}
-        logger.info(f"全链路-用户登录 | POST {self.login_url} | data={data}")
+        logger.info(f"全链路-用户登录 | POST {self.login_url} | username={data['username']}")
         resp = self.session.post(self.login_url, data=data)
         logger.info(f"全链路-用户登录 | 响应状态码: {resp.status_code}")
         return resp

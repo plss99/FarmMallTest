@@ -170,7 +170,7 @@ class GetLogger:
 
         handler = http.server.SimpleHTTPRequestHandler
         try:
-            with socketserver.TCPServer(("", port), handler) as httpd:
+            with socketserver.TCPServer(("127.0.0.1", port), handler) as httpd:
                 url = f"http://127.0.0.1:{port}"
                 logger.info("Allure 报告已启动: {}", url)
                 print(f"\n{'='*60}")

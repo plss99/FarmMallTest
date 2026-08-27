@@ -1,7 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 虚拟环境 / 缓存
 /.venv/
 /.deepeval/
+
+# 敏感配置（含数据库密码、测试账号密码，不提交到 Git）
 /config.py
-__pycache__/
+/config.local.py
+.env
+.env.*
+
+# 测试数据（含账号密码，仅保留本地；模板见 data/*.example.yaml）
+/data/user_login.yaml
+/data/user_login_error.yaml
+/data/admin_login.yaml
+/data/user_reg.yaml
+
+# IDE 本地配置
+.idea/
+
+# 日志与测试报告（可能包含接口响应、个人信息）
 log/
 report/
+
+# 私钥 / 证书
+*.pem
+*.key
+*.p12
+*.jks
+*.pfx
+*.cer
+id_rsa*
+
+# 其他
 *.zip

@@ -3,6 +3,7 @@ import requests
 from loguru import logger
 
 import api
+from config import TEST_ACCOUNTS
 
 
 class ApiAdmin:
@@ -15,10 +16,13 @@ class ApiAdmin:
         self.url_users = api.host + "/admin/users"
         self.session = session if session is not None else requests.Session()
 
-    def api_admin_login(self, username="admin", password="REDACTED"):
+    def api_admin_login(self, username=None, password=None):
+        if username is None or password is None:
+            username = TEST_ACCOUNTS["admin"]["username"]
+            password = TEST_ACCOUNTS["admin"]["password"]
         login_url = api.host + "/login"
         data = {"username": username, "password": password}
-        logger.info("管理员登录 | POST {} | data={}", login_url, data)
+        logger.info("管理员登录 | POST {} | username={}", login_url, username)
         self.session.post(url=login_url, data=data)
         logger.info("管理员访问后台 | GET {}", self.url_login)
         resp = self.session.get(url=self.url_login)
