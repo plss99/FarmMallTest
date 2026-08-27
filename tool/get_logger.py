@@ -14,6 +14,9 @@ REPORT_DIR = BASE_DIR / "report"
 RESULT_DIR = REPORT_DIR / "allure_results"
 HTML_DIR = REPORT_DIR / "allure_report"
 HISTORY_DIR = HTML_DIR / "history"
+# 虚拟环境中的 allure 命令行工具路径
+_VENV_DIR = BASE_DIR / ".venv"
+_ALLURE_BIN = _VENV_DIR / "allure-cli" / "allure-2.45.0" / "bin" / "allure.bat"
 
 
 class GetLogger:
@@ -141,7 +144,7 @@ class GetLogger:
             logger.warning("allure_results 目录为空，请先运行测试")
             return 1
 
-        cmd = f'allure generate "{RESULT_DIR}" -o "{HTML_DIR}" --clean'
+        cmd = f'"{_ALLURE_BIN}" generate "{RESULT_DIR}" -o "{HTML_DIR}" --clean'
         logger.info("生成报告: {}", cmd)
         result = subprocess.run(cmd, cwd=str(BASE_DIR), shell=True)
 
